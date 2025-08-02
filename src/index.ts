@@ -226,7 +226,7 @@ export class WordgetGame {
           guesses: parsedState.guesses || [],
           revealedLetters: new Set(parsedState.revealedLetters),
           correctPositions: new Map(
-            Object.entries(parsedState.correctPositions || {})
+            Object.entries(parsedState.correctPositions || {}).map(([k, v]) => [Number(k), v])
           ),
           incorrectGuesses: new Set(parsedState.incorrectGuesses || []),
         };
@@ -399,15 +399,19 @@ export class WordgetGame {
       // Add appropriate color classes
       if (this.state.revealedLetters.has(letter)) {
         if (this.state.targetWord.includes(letter)) {
-          if (
-            this.state.correctPositions.has(
-              Array.from(this.state.targetWord).findIndex((l) => l === letter)
-            )
-          ) {
-            key.classList.add("correct");
-          } else {
-            key.classList.add("present");
-          }
+            // Find all positions where this letter appears in targetWord
+            const letterPositions = Array.from(this.state.targetWord)
+              .map((l, i) => l === letter ? i : -1)
+              .filter(i => i !== -1);
+            
+            // Check if any of these positions are in correctPositions
+            const isCorrect = letterPositions.some(pos => this.state.correctPositions.has(pos));
+            
+            if (isCorrect) {
+              key.classList.add("correct");
+            } else {
+              key.classList.add("present");
+            }
         } else {
           key.classList.add("absent");
         }
