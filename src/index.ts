@@ -52,6 +52,9 @@ export class WordgetGame {
     // Load stats from localStorage
     this.loadStats();
 
+    // Set the game count based on the last completed round
+    this.state.gameCount = this.getGameCount();
+    
     // Set the target word based on the game count
     this.state.targetWord = this.getTodaysWord();
 
@@ -88,15 +91,35 @@ export class WordgetGame {
   }
 
   private getGameCount(): number {
+    // Get the last completed round from localStorage
+    const savedLastCompletedRound = localStorage.getItem("wordget-last-completed-round");
     const today = new Date().toDateString();
-    if (this.stats.lastPlayedDate !== today) {
-      // If it's a new day, reset the game count
-      return 1;
-    } else {
-      // If it's the same day, return the current game count
-      return this.state.gameCount;
+    
+    if (savedLastCompletedRound) {
+      try {
+        const lastCompleted = JSON.parse(savedLastCompletedRound);
+        // If it's from today, continue from the next round
+        if (lastCompleted.date === today) {
+          return lastCompleted.round + 1;
+        }
+      } catch (e) {
+        console.error("Failed to parse last completed round", e);
+      }
     }
+    
+    // If no saved round or not from today, start from round 1
+    return 1;
   }
+
+  private saveLastCompletedRound(): void {
+    const lastCompleted = {
+      round: this.state.gameCount,
+      date: new Date().toDateString()
+    };
+    
+    localStorage.setItem("wordget-last-completed-round", JSON.stringify(lastCompleted));
+  }
+
 
   private updateStatsDisplay(): void {
     const winCountElement = document.getElementById("winCount");
@@ -197,15 +220,16 @@ export class WordgetGame {
 
         // Only load state if it's from today
         if (parsedState.date === today) {
-          this.state = {
-            ...this.state,
-            ...parsedState,
-            revealedLetters: new Set(parsedState.revealedLetters),
-            correctPositions: new Map(
-              Object.entries(parsedState.correctPositions || {})
-            ),
-            incorrectGuesses: new Set(parsedState.incorrectGuesses || []),
-          };
+        this.state = {
+          ...this.state,
+          ...parsedState,
+          guesses: parsedState.guesses || [],
+          revealedLetters: new Set(parsedState.revealedLetters),
+          correctPositions: new Map(
+            Object.entries(parsedState.correctPositions || {})
+          ),
+          incorrectGuesses: new Set(parsedState.incorrectGuesses || []),
+        };
 
           // Re-render the board
           this.renderBoard();
@@ -229,8 +253,10 @@ export class WordgetGame {
     const stateToSave = {
       ...this.state,
       date: new Date().toDateString(),
+      guesses: this.state.guesses,
       revealedLetters: Array.from(this.state.revealedLetters),
       correctPositions: Object.fromEntries(this.state.correctPositions),
+      incorrectGuesses: Array.from(this.state.incorrectGuesses),
     };
 
     localStorage.setItem("wordget-state", JSON.stringify(stateToSave));
@@ -401,6 +427,9 @@ export class WordgetGame {
     this.showMessage(message);
     this.state.gameOver = true;
     this.state.won = won;
+
+    // Save the last completed round
+    this.saveLastCompletedRound();
 
     // Update statistics if game was won
     if (won) {
