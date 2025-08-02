@@ -4,8 +4,8 @@
   "description": "A Wordle clone that works offline and saves daily progress",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "bun --hot ./src/index.html",
-    "build": "bun build --outdir dist",
+    "dev": "bun --hot ./server.ts",
+    "build": "bun build ./src/index.ts --outdir dist",
     "test": "bun test"
   },
   "keywords": ["wordle", "game", "typescript", "bun"],

@@ -1,7 +1,6 @@
 const CACHE_NAME = 'wordget-v1';
 const urlsToCache = [
   '/',
-  '/index.html',
   '/style.css',
   '/index.ts'
 ];
