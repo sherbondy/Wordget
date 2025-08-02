@@ -20,7 +20,7 @@ const server = serve({
       return new Response(Bun.file("./src/style.css"));
     }
     
-    if (pathname === "/index.ts") {
+    if (pathname === "/index.ts" || pathname === "/index.js") {
       // Serve the compiled JavaScript file
       return new Response(Bun.file("./dist/index.js"), {
         headers: { "Content-Type": "application/javascript" },
