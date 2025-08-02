@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Wordget - A Wordle Clone</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -68,10 +68,11 @@
     
     <script type="module" src="index.js"></script>
     <script>
+        window.GIT_SHA = 'REPLACE_WITH_GIT_SHA';
         // Register service worker for offline functionality
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('/sw.js?cachebust=' + window.GIT_SHA)
                     .then((registration) => {
                         console.log('SW registered: ', registration);
                     })
