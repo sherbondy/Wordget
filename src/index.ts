@@ -56,7 +56,7 @@ export class WordgetGame {
     this.state.gameCount = this.getGameCount();
     
     // Set the target word based on the game count
-    this.state.targetWord = this.getTodaysWord();
+    this.state.targetWord = this.getTodaysWord().toLowerCase();
 
     this.gameBoard = document.getElementById("gameBoard")!;
     this.keyboard = document.getElementById("keyboard")!;
@@ -319,7 +319,7 @@ export class WordgetGame {
     }
 
     // Add the current guess to guesses array
-    this.state.guesses.push(this.state.currentGuess);
+    this.state.guesses.push(guess);
 
     // Reset current guess before rendering to prevent duplication
     this.state.currentGuess = "";
@@ -506,7 +506,7 @@ export class WordgetGame {
 
     // Reset game state
     this.state = {
-      targetWord: this.getTodaysWord(),
+      targetWord: this.getTodaysWord().toLowerCase(),
       currentGuess: "",
       guesses: [],
       gameOver: false,
