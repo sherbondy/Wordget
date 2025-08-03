@@ -112,12 +112,16 @@ export class WordgetGame {
   }
 
   private saveLastCompletedRound(): void {
-    const lastCompleted = {
-      round: this.state.gameCount,
-      date: new Date().toDateString()
-    };
-    
-    localStorage.setItem("wordget-last-completed-round", JSON.stringify(lastCompleted));
+    try {
+      const lastCompleted = {
+        round: this.state.gameCount,
+        date: new Date().toDateString()
+      };
+      
+      localStorage.setItem("wordget-last-completed-round", JSON.stringify(lastCompleted));
+    } catch (e) {
+      console.error("Failed to save last completed round", e);
+    }
   }
 
 
@@ -250,16 +254,20 @@ export class WordgetGame {
   }
 
   private saveGameState(): void {
-    const stateToSave = {
-      ...this.state,
-      date: new Date().toDateString(),
-      guesses: this.state.guesses,
-      revealedLetters: Array.from(this.state.revealedLetters),
-      correctPositions: Object.fromEntries(this.state.correctPositions),
-      incorrectGuesses: Array.from(this.state.incorrectGuesses),
-    };
+    try {
+      const stateToSave = {
+        ...this.state,
+        date: new Date().toDateString(),
+        guesses: this.state.guesses,
+        revealedLetters: Array.from(this.state.revealedLetters),
+        correctPositions: Object.fromEntries(this.state.correctPositions),
+        incorrectGuesses: Array.from(this.state.incorrectGuesses),
+      };
 
-    localStorage.setItem("wordget-state", JSON.stringify(stateToSave));
+      localStorage.setItem("wordget-state", JSON.stringify(stateToSave));
+    } catch (e) {
+      console.error("Failed to save game state", e);
+    }
   }
 
   private addLetter(letter: string): void {
@@ -474,7 +482,11 @@ export class WordgetGame {
   }
 
   private saveStats(): void {
-    localStorage.setItem("wordget-stats", JSON.stringify(this.stats));
+    try {
+      localStorage.setItem("wordget-stats", JSON.stringify(this.stats));
+    } catch (e) {
+      console.error("Failed to save stats", e);
+    }
   }
 
   private resetGame(): void {
