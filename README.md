@@ -10,6 +10,12 @@ I manually checkpointed commits after each incremental task.
 
 ---
 
+Demo Video:
+
+https://youtu.be/cQOdyUETQc4
+
+---
+
 This uses bun!
 
 https://bun.sh
