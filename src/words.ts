@@ -1,4 +1,4 @@
-export const WORDS = [
+export const VALID_ANSWER_WORDS = [
   "aback",
   "abase",
   "abate",
@@ -2314,6 +2314,9 @@ export const WORDS = [
   "zebra",
   "zesty",
   "zonal",
+];
+
+export const OTHER_VALID_GUESS_WORDS = [
   "aahed",
   "aalii",
   "aargh",

@@ -133,18 +133,18 @@ describe("WordgetGame", () => {
     };
     
     // After first guess with no correct letters, no revealed letters
-    game["state"].currentGuess = "BBBBB";
+    game["state"].currentGuess = "BRINK";
     game["submitGuess"]();
     expect(game["state"].revealedLetters.size).toBe(0);
     
     // After guess with some correct letters, those letters should be revealed
     game["state"].currentRow = 1;
-    game["state"].currentGuess = "PALEP";
+    game["state"].currentGuess = "ABBEY";
     game["submitGuess"]();
-    expect(game["state"].revealedLetters.has("A")).toBe(true);
-    expect(game["state"].revealedLetters.has("P")).toBe(true);
-    expect(game["state"].revealedLetters.has("L")).toBe(true);
-    expect(game["state"].revealedLetters.has("E")).toBe(true);
+    expect(game["state"].revealedLetters.has("a")).toBe(true);
+    expect(game["state"].revealedLetters.has("p")).toBe(false);
+    expect(game["state"].revealedLetters.has("l")).toBe(false);
+    expect(game["state"].revealedLetters.has("e")).toBe(true);
     
     // Restore original getElementById
     globalThis.document.getElementById = originalGetElementById;
@@ -180,13 +180,13 @@ describe("WordgetGame", () => {
     };
     
     // First guess reveals some letters
-    game["state"].currentGuess = "PALEP";
+    game["state"].currentGuess = "ABBEY";
     game["submitGuess"]();
     
     // Test the includesRevealedLetters method directly
-    expect(game.includesRevealedLetters("BBBBB")).toBe(false);
+    expect(game.includesRevealedLetters("BRINK")).toBe(false);
     expect(game.includesRevealedLetters("APPLE")).toBe(true);
-    expect(game.includesRevealedLetters("APPLY")).toBe(false);
+    expect(game.includesRevealedLetters("APPLY")).toBe(true);
     
     // Restore original getElementById
     globalThis.document.getElementById = originalGetElementById;
@@ -258,11 +258,27 @@ describe("WordgetGame", () => {
       }
       return null;
     };
-    
+
+    // we want to make 6 distinct guesses that do not have overlapping incorrect letters
+    // but may have some letters that are in the target word
+    let mutuallyExclusiveGuessesWithoutAppleLetters = [
+      // first word no overlap
+      "BRINK",
+      // second word has L overlap, so all future words must have L in guess
+      "CLOTH",
+      // third word has L, A, and E overlap
+      "FLAME",
+      // fourth word has L, A, and E overlap
+      "GLARE",
+      // fifth word has P, L, A, and E overlap
+      "PLATE",
+      // sixth word has P, L, A, and E overlap, must end with an E
+      "PLANE"
+    ];
     // Make 6 incorrect guesses
     for (let i = 0; i < 6; i++) {
       game["state"].currentRow = i;
-      game["state"].currentGuess = "BBBBB";
+      game["state"].currentGuess = mutuallyExclusiveGuessesWithoutAppleLetters[i];
       game["submitGuess"]();
     }
     

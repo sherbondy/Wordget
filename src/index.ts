@@ -1,5 +1,5 @@
-// Standard Wordle word list (subset for demo purposes)
-import { WORDS } from "./words";
+// Standard Wordle word lists
+import { VALID_ANSWER_WORDS, OTHER_VALID_GUESS_WORDS } from "./words";
 
 // Game state
 interface GameState {
@@ -151,9 +151,9 @@ export class WordgetGame {
 
     // Use a simple seeded random number generator
     const random = this.seededRandom(gameSeed);
-    const index = Math.floor(random * WORDS.length);
+    const index = Math.floor(random * VALID_ANSWER_WORDS.length);
 
-    return WORDS[index];
+    return VALID_ANSWER_WORDS[index];
   }
 
   private seededRandom(seed: number): number {
@@ -288,8 +288,11 @@ export class WordgetGame {
     if (this.state.currentGuess.length !== 5) return;
     if (this.state.gameOver) return;
 
+    // Combine both word lists for valid guesses
+    const ALL_VALID_GUESS_WORDS = [...VALID_ANSWER_WORDS, ...OTHER_VALID_GUESS_WORDS];
+    
     const guess = this.state.currentGuess.toLowerCase();
-    if (!WORDS.includes(guess)) {
+    if (!ALL_VALID_GUESS_WORDS.includes(guess)) {
       console.log("Invalid word:", guess);
       this.showMessage("Word not in dictionary!");
       return;
