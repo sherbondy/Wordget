@@ -1,8 +1,7 @@
-const CACHE_NAME = 'wordget-v2';
+const CACHE_NAME = 'wordget-v3';
 const urlsToCache = [
   '/',
   '/style.css',
-  '/index.ts',
   '/manifest.json',
   '/index.js',
 ];
