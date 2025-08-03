@@ -399,8 +399,9 @@ export class WordgetGame {
   private updateKeyboard(): void {
     const keys = this.keyboard.querySelectorAll(".key");
     keys.forEach((key) => {
-      const letter = key.getAttribute("data-key")!;
-      if (letter === "Enter" || letter === "Backspace") return;
+      const keyData = key.getAttribute("data-key")!;
+      if (keyData === "Enter" || keyData === "Backspace") return;
+      const letter = keyData.toLowerCase();
 
       // Reset classes
       key.className = "key";
