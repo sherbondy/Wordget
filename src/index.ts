@@ -183,12 +183,12 @@ export class WordgetGame {
     document.addEventListener("keydown", (e) => {
       if (this.state.gameOver) return;
 
-      const key = e.key.toUpperCase();
-      if (key === "ENTER") {
+      const key = e.key.toLowerCase();
+      if (key === "enter") {
         this.submitGuess();
-      } else if (key === "BACKSPACE") {
+      } else if (key === "backspace") {
         this.deleteLetter();
-      } else if (/^[A-Z]$/.test(key)) {
+      } else if (/^[a-z]$/.test(key)) {
         this.addLetter(key);
       }
     });
@@ -280,7 +280,7 @@ export class WordgetGame {
     if (this.state.currentGuess.length !== 5) return;
     if (this.state.gameOver) return;
 
-    const guess = this.state.currentGuess.toUpperCase();
+    const guess = this.state.currentGuess.toLowerCase();
     if (!WORDS.includes(guess)) {
       this.showMessage("Word not in dictionary!");
       return;
@@ -289,7 +289,7 @@ export class WordgetGame {
     const row = document.getElementById(`row-${this.state.currentRow}`);
     if (!row) return;
 
-    const targetWord = this.state.targetWord.toUpperCase();
+    const targetWord = this.state.targetWord.toLowerCase();
 
     // Track revealed letters and correct positions
     for (let i = 0; i < 5; i++) {
@@ -532,13 +532,13 @@ export class WordgetGame {
     if (this.state.revealedLetters.size === 0) return true;
 
     // Check if the guess includes all revealed letters with correct frequency
-    const guessUpper = guess.toUpperCase();
+    const guessLower = guess.toLowerCase();
     const isValidFrequency = Array.from(this.state.revealedLetters).every(
       (letter) => {
         const targetCount = this.state.targetWord
           .split("")
           .filter((l) => l === letter).length;
-        const guessCount = guessUpper
+        const guessCount = guessLower
           .split("")
           .filter((l) => l === letter).length;
         return guessCount >= targetCount;
@@ -548,7 +548,7 @@ export class WordgetGame {
     // Check if the guess has letters in correct positions
     const isValidPositions = Array.from(this.state.correctPositions).every(
       ([pos, letter]) => {
-        return guessUpper[pos] === letter;
+        return guessLower[pos] === letter;
       }
     );
 
