@@ -25,6 +25,10 @@ const server = serve({
       return new Response(Bun.file("./src/style.css"));
     }
     
+    if (pathname === "/manifest.json") {
+      return new Response(Bun.file("./src/manifest.json"));
+    }
+    
     if (pathname === "/index.ts" || pathname === "/index.js") {
       // Serve the compiled JavaScript file
       return new Response(Bun.file("./dist/index.js"), {

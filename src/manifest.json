@@ -1,0 +1,8 @@
+{
+  "name": "Wordget",
+  "short_name": "Wordget",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121213",
+  "theme_color": "#121213"
+}
