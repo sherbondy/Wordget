@@ -308,6 +308,7 @@ export class WordgetGame {
       return;
     }
 
+    this.showMessage('');
     // Track revealed letters and correct positions
     for (let i = 0; i < 5; i++) {
       if (targetWord[i] === guess[i]) {
