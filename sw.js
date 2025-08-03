@@ -1,8 +1,10 @@
-const CACHE_NAME = 'wordget-v1';
+const CACHE_NAME = 'wordget-v2';
 const urlsToCache = [
   '/',
   '/style.css',
-  '/index.ts'
+  '/index.ts',
+  '/manifest.json',
+  '/index.js',
 ];
 
 // Install event - cache the assets
