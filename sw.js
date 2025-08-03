@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wordget-v3';
+const CACHE_NAME = 'wordget-v4';
 const urlsToCache = [
   '/',
   '/style.css',

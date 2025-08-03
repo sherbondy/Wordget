@@ -20,6 +20,7 @@ interface GameStats {
   winCount: number;
   streakCount: number;
   lastPlayedDate: string;
+  lastGameWon: boolean;
 }
 
 export class WordgetGame {
@@ -32,6 +33,7 @@ export class WordgetGame {
     winCount: 0,
     streakCount: 0,
     lastPlayedDate: "",
+    lastGameWon: false,
   };
 
   constructor() {
@@ -87,6 +89,7 @@ export class WordgetGame {
       winCount: 0,
       streakCount: 0,
       lastPlayedDate: "",
+      lastGameWon: false,
     };
   }
 
@@ -363,6 +366,16 @@ export class WordgetGame {
       const guess = this.state.guesses[i];
       const row = document.getElementById(`row-${i}`)!;
 
+      // Count occurrences of each letter in target word
+      const targetLetterCounts: Map<string, number> = new Map();
+      for (const letter of this.state.targetWord) {
+        targetLetterCounts.set(letter, (targetLetterCounts.get(letter) || 0) + 1);
+      }
+
+      // For each guess, we need to determine the color of each letter
+      // We'll track how many times we've correctly placed each letter in this guess
+      const correctInThisGuess: Map<string, number> = new Map();
+
       for (let j = 0; j < 5; j++) {
         const tile = document.getElementById(`tile-${i}-${j}`)!;
         tile.textContent = guess[j];
@@ -373,8 +386,24 @@ export class WordgetGame {
         // Add appropriate color classes
         if (guess[j] === this.state.targetWord[j]) {
           tile.classList.add("correct");
+          // Track correctly placed letters in this guess
+          const letter = guess[j];
+          correctInThisGuess.set(letter, (correctInThisGuess.get(letter) || 0) + 1);
         } else if (this.state.targetWord.includes(guess[j])) {
-          tile.classList.add("present");
+          // Check if this letter has already been correctly guessed the maximum number of times
+          const letter = guess[j];
+          const targetCount = targetLetterCounts.get(letter) || 0;
+          const correctCount = correctInThisGuess.get(letter) || 0;
+          
+          // If the letter appears only once in the target word and has already been 
+          // correctly guessed in this guess, don't mark it as present (yellow)
+          if (targetCount === 1 && correctCount >= 1) {
+            tile.classList.add("absent");
+          } else {
+            tile.classList.add("present");
+            // Track present letters in this guess
+            correctInThisGuess.set(letter, (correctInThisGuess.get(letter) || 0) + 1);
+          }
         } else {
           tile.classList.add("absent");
         }
@@ -421,7 +450,24 @@ export class WordgetGame {
             // Check if any of these positions are in correctPositions
             const isCorrect = letterPositions.some(pos => this.state.correctPositions.has(pos));
             
-            if (isCorrect) {
+            // Count occurrences of this letter in target word
+            const targetCount = Array.from(this.state.targetWord).filter(l => l === letter).length;
+            
+            // Count correctly placed occurrences in all guesses
+            let correctCount = 0;
+            for (const guess of this.state.guesses) {
+              for (let pos = 0; pos < 5; pos++) {
+                if (guess[pos] === letter && this.state.targetWord[pos] === letter) {
+                  correctCount++;
+                }
+              }
+            }
+            
+            // If the letter appears only once in the target word and has already been 
+            // correctly guessed, mark it as correct (green) on the keyboard
+            if (targetCount === 1 && correctCount >= 1) {
+              key.classList.add("correct");
+            } else if (isCorrect) {
               key.classList.add("correct");
             } else {
               key.classList.add("present");
@@ -449,27 +495,27 @@ export class WordgetGame {
     // Save the last completed round
     this.saveLastCompletedRound();
 
-    // Update statistics if game was won
+    // Update win count
     if (won) {
-      const today = new Date().toDateString();
       this.stats.winCount++;
-
-      // Update streak count
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayString = yesterday.toDateString();
-      if (this.stats.lastPlayedDate === yesterdayString) {
-        this.stats.streakCount++;
-      } else {
-        this.stats.streakCount = 1;
-      }
-
-      this.stats.lastPlayedDate = today;
-
-      // Save statistics
-      this.saveStats();
-      this.updateStatsDisplay();
     }
+
+    // Update streak count - increment on win, reset on loss
+    if (won) {
+      this.stats.streakCount++;
+    } else {
+      this.stats.streakCount = 0;
+    }
+
+    // Update last game result
+    this.stats.lastGameWon = won;
+    
+    // Update last played date
+    this.stats.lastPlayedDate = new Date().toDateString();
+
+    // Save statistics
+    this.saveStats();
+    this.updateStatsDisplay();
 
     // Add play again button
     if (this.playAgainButton) {
@@ -553,17 +599,11 @@ export class WordgetGame {
     // If no letters have been revealed, any guess is valid
     if (this.state.revealedLetters.size === 0) return true;
 
-    // Check if the guess includes all revealed letters with correct frequency
+    // Check if the guess includes all revealed letters
     const guessLower = guess.toLowerCase();
     const isValidFrequency = Array.from(this.state.revealedLetters).every(
       (letter) => {
-        const targetCount = this.state.targetWord
-          .split("")
-          .filter((l) => l === letter).length;
-        const guessCount = guessLower
-          .split("")
-          .filter((l) => l === letter).length;
-        return guessCount >= targetCount;
+        return guessLower.includes(letter);
       }
     );
 
