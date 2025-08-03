@@ -29,6 +29,10 @@ const server = serve({
       return new Response(Bun.file("./src/manifest.json"));
     }
     
+    if (pathname === "/icon.svg") {
+      return new Response(Bun.file("./icon.svg"));
+    }
+    
     if (pathname === "/index.ts" || pathname === "/index.js") {
       // Serve the compiled JavaScript file
       return new Response(Bun.file("./dist/index.js"), {

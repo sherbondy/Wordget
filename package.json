@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "bun --hot ./server.ts",
-    "build": "bun build ./src/index.ts --outdir dist && cp src/index.html dist/ && sed -i \"s/'REPLACE_WITH_GIT_SHA'/'$COMMIT_REF'/g\" dist/index.html && cp src/style.css dist/ && cp src/manifest.json dist/ && cp ./sw.js dist/",
+    "build": "bun build ./src/index.ts --outdir dist && cp src/index.html dist/ && sed -i \"\" \"s/'REPLACE_WITH_GIT_SHA'/'$COMMIT_REF'/g\" dist/index.html && cp src/style.css dist/ && cp src/manifest.json dist/ && cp ./sw.js dist/ && cp ./icon.svg dist/",
     "test": "bun test"
   },
   "keywords": ["wordle", "game", "typescript", "bun"],
