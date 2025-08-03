@@ -1,3 +1,5 @@
+![Wordget Icon Vibe-Coded SVG also created by Qwen](https://raw.githubusercontent.com/sherbondy/Wordget/refs/heads/main/icon.svg "Wordget (Icon Vibe-Coded SVG also created by Qwen)")
+
 # Wordget
 
 https://wordget.app
@@ -20,11 +22,25 @@ This uses bun!
 
 https://bun.sh
 
+Run locally on dev server:
 ```
 bun run dev
 ```
 
-For the dev server (the file serving stuff is a bit jank).
+(the file serving stuff is a bit jank, and Qwen still needs to fix cache-busting behavior for the service worker after updates).
+
+
+Run the test suite:
+```
+bun run test
+```
+
+Build all the necessary files for static distribution into `dist`:
+
+```
+bun run build
+```
+
 
 ---
 
