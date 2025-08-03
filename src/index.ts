@@ -300,6 +300,14 @@ export class WordgetGame {
 
     const targetWord = this.state.targetWord.toLowerCase();
 
+    // Validate that the guess includes all revealed letters and correct positions
+    if (!this.includesRevealedLetters(guess)) {
+      this.showMessage(
+        "Guess must include all revealed letters in correct positions!"
+      );
+      return;
+    }
+
     // Track revealed letters and correct positions
     for (let i = 0; i < 5; i++) {
       if (targetWord[i] === guess[i]) {
@@ -308,14 +316,6 @@ export class WordgetGame {
       } else if (targetWord.includes(guess[i])) {
         this.state.revealedLetters.add(guess[i]);
       }
-    }
-
-    // Validate that the guess includes all revealed letters and correct positions
-    if (!this.includesRevealedLetters(guess)) {
-      this.showMessage(
-        "Guess must include all revealed letters in correct positions!"
-      );
-      return;
     }
 
     // Add the current guess to guesses array
