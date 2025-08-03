@@ -1,8 +1,9 @@
 import { serve } from "bun";
+const gitSha = (await Bun.$`git rev-parse HEAD`.text()).trim();
 
 const server = serve({
   port: 3000,
-  fetch(req) {
+  fetch: async (req) => {
     const url = new URL(req.url);
     const pathname = url.pathname;
     
@@ -13,7 +14,11 @@ const server = serve({
     
     // Serve other static files from the src directory
     if (pathname === "/" || pathname === "/index.html") {
-      return new Response(Bun.file("./src/index.html"));
+      let html = await Bun.file("./src/index.html").text();
+      html = html.replace(/REPLACE_WITH_GIT_SHA/g, gitSha);
+      return new Response(html, {
+        headers: { "Content-Type": "text/html" },
+      });
     }
     
     if (pathname === "/style.css") {

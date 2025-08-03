@@ -282,6 +282,7 @@ export class WordgetGame {
 
     const guess = this.state.currentGuess.toLowerCase();
     if (!WORDS.includes(guess)) {
+      console.log("Invalid word:", guess);
       this.showMessage("Word not in dictionary!");
       return;
     }
@@ -482,6 +483,10 @@ export class WordgetGame {
       this.playAgainButton.remove();
       this.playAgainButton = null;
     }
+
+    // Clear previous game state references
+    this.state.revealedLetters.clear();
+    this.state.correctPositions.clear();
 
     // Update game count
     this.state.gameCount++;
