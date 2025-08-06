@@ -85,6 +85,8 @@
                 navigator.serviceWorker.register('/sw.js?cachebust=' + window.GIT_SHA)
                     .then((registration) => {
                         console.log('SW registered: ', registration);
+                        // Send the version to the service worker
+                        registration.active?.postMessage({type: 'SET_CACHE_VERSION', version: window.GIT_SHA});
                     })
                     .catch((registrationError) => {
                         console.log('SW registration failed: ', registrationError);

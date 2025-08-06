@@ -7,9 +7,14 @@ const server = serve({
     const url = new URL(req.url);
     const pathname = url.pathname;
     
-    // Serve the service worker file directly
+    // Serve the service worker file with Git SHA replacement
     if (pathname === "/sw.js") {
-      return new Response(Bun.file("./sw.js"));
+      let sw = await Bun.file("./sw.js").text();
+      // We don't need to replace Git SHA in the service worker file itself
+      // as it receives the version from the client via postMessage
+      return new Response(sw, {
+        headers: { "Content-Type": "application/javascript" },
+      });
     }
     
     // Serve other static files from the src directory
