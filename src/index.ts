@@ -656,14 +656,12 @@ export class WordgetGame {
     // Generate the share text
     const shareText = this.generateShareText();
     const title = "Today's Wordget";
-    const url = "https://wordget.app";
 
     // Check if Web Share API is available
     if (navigator.share) {
       navigator.share({
         title,
-        text: shareText,
-        url
+        text: shareText
       })
       .then(() => {
         // Share was successful
