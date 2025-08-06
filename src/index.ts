@@ -517,19 +517,54 @@ export class WordgetGame {
     this.saveStats();
     this.updateStatsDisplay();
 
-    // Add play again button
+    // Remove existing play again button if it exists
     if (this.playAgainButton) {
       this.playAgainButton.remove();
+    }
+
+    // Create and show modal
+    const modal = document.createElement("div");
+    modal.className = "modal";
+    modal.id = "gameEndModal";
+
+    const modalContent = document.createElement("div");
+    modalContent.className = "modal-content";
+
+    const modalTitle = document.createElement("div");
+    modalTitle.className = "modal-title";
+    modalTitle.classList.add(won ? "win" : "lose");
+    modalTitle.textContent = won ? "You Win!" : "You Lose!";
+
+    // Create share button if player won
+    let shareButton: HTMLButtonElement | null = null;
+    if (won) {
+      shareButton = document.createElement("button");
+      shareButton.textContent = "Share";
+      shareButton.className = "share-button";
+      shareButton.addEventListener("click", () => {
+        this.shareResults(shareButton!);
+      });
     }
 
     this.playAgainButton = document.createElement("button");
     this.playAgainButton.textContent = "Play Again";
     this.playAgainButton.className = "play-again";
     this.playAgainButton.addEventListener("click", () => {
+      modal.remove();
       this.resetGame();
       this.messageElement.textContent = "";
     });
-    this.messageElement.appendChild(this.playAgainButton);
+
+    modalContent.appendChild(modalTitle);
+    if (shareButton) {
+      modalContent.appendChild(shareButton);
+    }
+    modalContent.appendChild(this.playAgainButton);
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+
+    // Show the modal
+    modal.style.display = "flex";
   }
 
   private saveStats(): void {
@@ -615,6 +650,117 @@ export class WordgetGame {
     );
 
     return isValidFrequency && isValidPositions;
+  }
+
+  private shareResults(shareButton: HTMLButtonElement): void {
+    // Generate the share text
+    const shareText = this.generateShareText();
+    const title = "Today's Wordget";
+    const url = "https://wordget.app";
+
+    // Check if Web Share API is available
+    if (navigator.share) {
+      navigator.share({
+        title,
+        text: shareText,
+        url
+      })
+      .then(() => {
+        // Share was successful
+        shareButton.textContent = "Shared!";
+        setTimeout(() => {
+          if (!this.state.gameOver) return;
+          shareButton.textContent = "Share";
+        }, 2000);
+      })
+      .catch((error) => {
+        // Share failed, fallback to clipboard
+        console.error("Sharing failed:", error);
+        this.copyToClipboard(shareText, shareButton);
+      });
+    } else {
+      // Web Share API not available, fallback to clipboard
+      this.copyToClipboard(shareText, shareButton);
+    }
+  }
+
+  private generateShareText(): string {
+    let shareText = `Wordget ${new Date().toDateString()} #${this.state.gameCount} ${this.state.guesses.length}/6\n\n`;
+    
+    // Create the emoji grid
+    for (let i = 0; i < this.state.guesses.length; i++) {
+      const guess = this.state.guesses[i];
+      const targetWord = this.state.targetWord.toLowerCase();
+      
+      // Count occurrences of each letter in target word
+      const targetLetterCounts: Map<string, number> = new Map();
+      for (const letter of targetWord) {
+        targetLetterCounts.set(letter, (targetLetterCounts.get(letter) || 0) + 1);
+      }
+      
+      // For each guess, we need to determine the color of each letter
+      // We'll track how many times we've correctly placed each letter in this guess
+      const correctInThisGuess: Map<string, number> = new Map();
+      
+      for (let j = 0; j < 5; j++) {
+        if (guess[j] === targetWord[j]) {
+          shareText += "🟩";
+          // Track correctly placed letters in this guess
+          const letter = guess[j];
+          correctInThisGuess.set(letter, (correctInThisGuess.get(letter) || 0) + 1);
+        } else if (targetWord.includes(guess[j])) {
+          // Check if this letter has already been correctly guessed the maximum number of times
+          const letter = guess[j];
+          const targetCount = targetLetterCounts.get(letter) || 0;
+          const correctCount = correctInThisGuess.get(letter) || 0;
+          
+          // If the letter appears only once in the target word and has already been 
+          // correctly guessed in this guess, don't mark it as present (yellow)
+          if (targetCount === 1 && correctCount >= 1) {
+            shareText += "⬛️";
+          } else {
+            shareText += "🟨";
+            // Track present letters in this guess
+            correctInThisGuess.set(letter, (correctInThisGuess.get(letter) || 0) + 1);
+          }
+        } else {
+          shareText += "⬛️";
+        }
+      }
+      shareText += "\n";
+    }
+    
+    // Add empty rows if game wasn't completed in 6 guesses
+    const emptyRows = 6 - this.state.guesses.length;
+    for (let i = 0; i < emptyRows; i++) {
+      shareText += "⬜⬜⬜⬜⬜\n";
+    }
+    
+    // Add the URL at the end of the share text
+    shareText += "\nhttps://wordget.app";
+    
+    return shareText;
+  }
+
+  private copyToClipboard(text: string, shareButton: HTMLButtonElement): void {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        // Copy was successful
+        shareButton.textContent = "Copied!";
+        setTimeout(() => {
+          if (!this.state.gameOver) return;
+          shareButton.textContent = "Share";
+        }, 2000);
+      })
+      .catch((error) => {
+        // Copy failed
+        console.error("Copying failed:", error);
+        shareButton.textContent = "Copy failed!";
+        setTimeout(() => {
+          if (!this.state.gameOver) return;
+          shareButton.textContent = "Share";
+        }, 2000);
+      });
   }
 }
 
